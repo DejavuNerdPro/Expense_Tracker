@@ -1,0 +1,364 @@
+﻿@section header{
+    @await Html.PartialAsync("_PartialHeader", new HeaderModel("Expense Tracker"))
+}
+<div class="body-container">
+    <div class="container">
+        <div class="header-container">
+            <img src="https://i.ibb.co/jfScDTC/budget.png"
+                 alt="Expense Tracker" />
+            <div class="balance-container" id="container">
+                <h2>Your Balance</h2>
+                <h2 id="balance" class="balance">$0.00</h2>
+            </div>
+        </div>
+        <div class="inc-exp-container">
+            <div>
+                <h4>Income</h4>
+                <p id="money-plus" class="money plus">+$0.00</p>
+            </div>
+            <div>
+                <h4>Expenses</h4>
+                <p id="money-minus" class="money minus">-$0.00</p>
+            </div>
+        </div>
+        <h3>History</h3>
+        <ul id="list" class="list"></ul>
+        <nav aria-label="Page navigation example">
+            <div class="row">
+                <span class="pagination page-item">
+                    <span class="page-link" aria-label="Previous" id="previous">
+                        <span aria-hidden="true">&laquo;</span>
+                        <span class="sr-only">Previous</span>
+                    </span>
+                </span>
+                <ul id="itemsContainer" class="horizontal-list"></ul>
+                    
+                    <span class="pagination page-item">
+                        <span class="page-link" aria-label="Next" id="next">
+                            <span aria-hidden="true">&raquo;</span>
+                            <span class="sr-only">Next</span>
+                        </span>
+                    </span>
+            </div> 
+</nav>
+       
+        <h3>Add new transaction</h3>
+        <form id="form">
+            <div class="form-control">
+                <label for="text">Description</label>
+                <input type="text" id="description" placeholder="Enter description..." name="Text" />
+                <label for="amount">
+                    Amount <br />
+                </label>
+                <div id='type'>
+                    <input type='radio' id='radio_1' name='type' value='1' /><label for="radio_1"><small>Income</small></label>
+                    <input type='radio' id='radio_2' name='type' value='2' /><label for="radio_2"><small>Expense</small></label>
+                </div>
+                <input type="text" id="amount" placeholder="Enter amount..." name="Amount" />
+            </div>
+            <button class="btn" type="button" id="add_tranaction">Add transaction</button>
+        </form>
+    </div>
+</div>
+<!-- Notification -->
+<div class="notification-container" id="notification">
+    <p>Please add a description and amount</p>
+</div>
+<!--Validator-->
+<div class="validator-container" id="validator">
+    <p>The amount should be separated with commas(eg. 123,234.00).</p>
+</div>
+@section scripts{
+    <script>
+        let _transaction_Detail;
+        const balance = document.getElementById("balance");
+        const moneyPlus = document.getElementById("money-plus");
+        const moneyMinus = document.getElementById("money-minus");
+        const list = document.getElementById("list");
+        const form = document.getElementById("form");
+        const text = document.getElementById("description");
+        const amount = document.getElementById("amount");
+        const notification = document.getElementById("notification");
+        const validator = document.getElementById("validator");
+        const itemsContainer = document.getElementById("itemsContainer");
+        var numberOfPage;
+        var pageRange;
+
+        $("#body-container").ready(async function () {
+            console.log("Document Loaded");
+            await addTransactionDOM();
+            updateValues();
+            $("#description").focus();
+        });
+
+        $("#description").on("keypress paste", function (e) {
+            if (e.keyCode == 13) {
+                console.log("Enter key pressed on description;");
+                $('#radio_1').focus();
+                $('#radio_1').prop('checked', true);
+                console.log("Radio 1 is auto focusing.");
+            }
+            $("#radio_1").on("keypress paste", function (e) {
+                console.log("Keypress on radio1");
+                if (e.keyCode == 13) {
+                    console.log("Press enterRadio Button1.");
+                    $("#amount").focus();
+                }
+            });
+            $("#radio_2").on("keypress paste", function (e) {
+                console.log("Keypress on radio2");
+                if (e.keyCode == 13) {
+                    console.log("Press enter radio button2");
+                    $("#amount").focus();
+                }
+            });
+        });
+        $("#radio_1").on("keypress paste", function (e) {
+            console.log("Keypress on radio1");
+            if (e.keyCode == 13) {
+                console.log("Press enterRadio Button1.");
+                $("#amount").focus();
+            }
+        });
+        $("#radio_2").keydown("keypress paste", function (e) {
+            console.log("Keypress on radio2");
+            if (e.keyCode == 13) {
+                console.log("Press enter radio button2");
+                $("#amount").focus();
+            }
+        });
+        $("#amount").on("keypress paste", function (e) {
+            var c = this.selectionStart, v = $(this).val();
+            if (e.keyCode == 13) {
+                console.log("Amount Enter Key pressed.");
+                addTransaction();
+            }
+            if (e.type == "keypress")
+                var key = String.fromCharCode(!e.charCode ? e.which : e.charCode)
+            else
+                var key = e.originalEvent.clipboardData.getData('Text')
+            var val = v.substr(0, c) + key + v.substr(c, v.length)
+            if (!val.match(/^[0-9,]*$/) || val.match(/^[0-9,]*$/).toString() != val) {
+                if (e.keyCode != 13) {
+                    e.preventDefault()
+                    alert("Only Digits allow");
+                }
+                return false
+            }
+            var amount = toNumber(val);
+            setTimeout(function () {
+                $("#amount").val(numberWithCommas(amount));
+            }, 50);
+        });
+
+        function numberWithCommas(x) {
+            var parts = x.toString().split(".");
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            return parts.join(".");
+        }
+        $('#add_transaction').click(function (e) {
+            console.log("Form Submit");
+            e.preventDefault();
+            addTransaction();
+        });
+
+        $("#previous").click(function () {
+            console.log("Previous click.");
+            if (pageRange == 1) {
+                console.log("Start of page : ");
+                pageRange = 1;
+            } else {
+                pageRange--;
+            }
+            console.log("Page Range : ", pageRange);
+        });
+
+        $("#next").click(function () {
+            console.log("Next click.");
+            if (pageRange == 10) {
+                pageRange = 10;
+                console.log("End of page : ");
+            } else {
+                pageRange++;
+            }
+            console.log("Page Range : ", pageRange);
+        });
+
+        function showNotification() {
+            console.log("Notification shows.");
+            notification.classList.add("show");
+            setTimeout(() => {
+                notification.classList.remove("show");
+            }, 2000);
+            $("#amount").focus();
+        }
+
+        function showValidator() {
+            console.log("Validation shows.");
+            validator.classList.add("show");
+            setTimeout(() => {
+                validator.classList.remove("show");
+            }, 2000);
+        }
+
+        async function addTransaction() {
+            console.log("Text : ", text.value);
+            console.log("TransactionType: ",)
+            console.log("Amount : ", amount.value, "type: ", typeof amount.value);
+            if (text.value.trim() === "" || amount.value.trim() === "") {
+                console.log("Form Field is blank.");
+                showNotification();
+            } else {
+                console.log("Form Field is not blank.");
+                var amount_validator = amount.value;
+                console.log("Amount Validator : ", amount_validator);
+                var isMatch = (amount_validator.match(/(?=.)^[1-9]?(([1-9][0-9]{0,2}(,[0-9]{3})*)|0)?(\.[0-9]{1,2})?$/)) ? true : false;
+                 console.log("Is Match : ", isMatch);
+                if (!isMatch) {
+                cosole.log("Not Validated");
+                  showValidator();
+                } else {
+                console.log("Validated");
+                var radioCheck;
+                if ($("#radio_1").is(":checked")) {
+                    radioCheck = "income";
+                    console.log("Radio 1 is checked.", radioCheck);
+                }
+                else if ($("#radio_2").is(":checked")) {
+                    radioCheck = "expense";
+                    console.log("Radio 2 is checked.", radioCheck);
+                }
+
+                const _transaction = {
+                    Text: text.value,
+                    Type: radioCheck,
+                    Amount: amount.value,
+                };
+                console.log("transaction : ", _transaction);
+                console.log("Add Transaction to DB is arrived.")
+                const response = await addToDB(_transaction);
+                console.log("Insert in DB : ", { response });
+                console.log("Add Transaction to DB is ended.")
+                await addTransactionDOM();//to retrieve from the database
+                updateValues();
+                text.value = "";
+                amount.value = "";
+                }
+            }
+        }
+
+        function addToDB(_transaction) {
+            return $.ajax({
+                url: "/ExpenseTracker/ExpenseTrackerAdd",
+                type: "POST",
+                data: { transaction: _transaction },
+                dataType: "json"
+            });
+        }
+
+        async function addTransactionDOM() {
+            console.log("Add Transaction Dom is arrived.")
+            list.innerHTML = "";
+            const response = await retrieve();
+            _transaction_Detail = response.list;
+            console.log("Outer Ajax ExpenseTrackerProduce:", _transaction_Detail);
+            const length = _transaction_Detail.length;
+            console.log("Length : ", length);
+            for (var i = 0; i < length; i++) {
+                console.log("For loop inner : ")
+                const amount = _transaction_Detail[i].amount;
+                console.log("Amount : ", amount, " ", typeof amount);
+                const transactionType = _transaction_Detail[i].transactionType;
+                const sign = transactionType === "expense" ? "-" : "+";
+                const valided_amount = amount.toString().substring(1);
+                console.log("Sign : ", sign, "Amount : ", valided_amount);
+                console.log("Expense Tracker Detail : ", _transaction_Detail[i].description, " ", sign, " ", _transaction_Detail[i].id);
+                const item = document.createElement("li");
+                item.classList.add(sign === "-" ? "minus" : "plus");
+                item.innerHTML = `
+                  ${_transaction_Detail[i].description} <span>${sign}${Math.abs(amount)}</span
+                  ><button class="delete-btn" onclick="removeTransaction(${_transaction_Detail[i].id})"><i class="fa fa-times"></i></button>
+            `;
+                list.appendChild(item);
+            }
+            
+            if (length % 5 != 0) {
+                var digit = Math.trunc(length / 5); //to transform float to pure number
+                console.log("After Converting digit : ", digit, " Wired : ", Math.trunc(46 / 5));
+                numberOfPage = digit+1;
+            } else {
+                numberOfPage = length / 5;
+            }
+            console.log("Number of Page : ", numberOfPage);
+            if (numberOfPage % 5 != 0) {
+                var digit = Math.trunc(numberOfPage / 5); //to transform float to pure number
+                console.log("After Converting digit : ", digit, " Wired : ", Math.trunc(46 / 5));
+                pageRange = digit + 1;
+            } else {
+                pageRange = numberOfPage / 5;
+            }
+            console.log("Number of  page range : ", pageRange);
+            for (var i = 1; i <= pageRange; i++) {
+                console.log("page Rage iterator : ", i);
+                const item = document.createElement("li");
+                item.innerHTML = `${i}`;
+                itemsContainer.appendChild(item);
+            }
+        }
+
+        function pageClick(i) {
+            Console.log("Clicked at : ", i);
+        }
+
+        function retrieve() {
+            return $.ajax({
+                url: "/ExpenseTracker/ExpenseTrackerProduce",
+                type: "GET",
+                dataType: "json",
+            });
+        }
+
+        async function removeTransaction(id) {
+            console.log("Remove Transaction is working.")
+            const response = await remove(id);
+            console.log("Remove Transaction is done.", { response });
+            $("#list").ready(function () {
+                console.log("List Loading .");
+                _transaction_Detail = null;
+                list.innerHTML = "";
+                console.log("Transaction Detail during remove : ", _transaction_Detail);
+                addTransactionDOM();
+                updateValues();
+            });
+        }
+
+        function remove(id) {
+            const _transaction = {
+                TransId: id
+            };
+            return $.ajax({
+                url: "/ExpenseTracker/ExpenseTrackerRemove",
+                type: "POST",
+                data: { transaction: _transaction },
+                dataType: "json"
+            });
+        }
+
+        function updateValues() {
+            console.log("Update Value is working..");
+            $.ajax({
+                url: "/ExpenseTracker/ExpenseTrackerUpdateValues",
+                type: "POST",
+                dataType: "json",
+                success: function (response) {
+                    $("#balance").html("$$ " + response.balance);
+                    $("#money-plus").html("+$ " + response.income);
+                    $("#money-minus").html("-$ " + response.expense);
+                    $("#description").focus();
+                }
+
+            });
+        }
+
+    </script>
+}

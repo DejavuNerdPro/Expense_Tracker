@@ -1,0 +1,72 @@
+﻿@section header{
+    @await Html.PartialAsync("_PartialHeader", new HeaderModel("Yearly Report"))
+}
+<div class="col-xl-12">
+    <div class="card your_balance">
+        <div class="card-header border-0">
+            <div>
+                @*<h2 class="heading mb-1">Yearly Report</h2>*@
+            </div>
+        </div>
+        <div class="card-body pt-0 custome-tooltip">
+            <div class="row gx-0">
+                <div class="col-xl-12 col-sm-12" style="position: relative;">
+                    <div id="chart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script>
+        var options = {
+            series: [{
+                name: 'Income',
+                data: @(Html.Raw(JsonConvert.SerializeObject(ViewBag.line_chart.LineChartIncomeLabel)))
+                        }, {
+                name: 'Expense',
+                data: @(Html.Raw(JsonConvert.SerializeObject(ViewBag.line_chart.LineChartExpenseLabel)))
+                         }],
+            chart: {
+                type: 'bar',
+                height: 350
+            },
+            plotOptions: {
+                bar: {
+                    horizontal: false,
+                    columnWidth: '55%',
+                    endingShape: 'rounded'
+                },
+            },
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                show: true,
+                width: 2,
+                colors: ['transparent']
+            },
+            xaxis: {
+                categories: @(Html.Raw(JsonConvert.SerializeObject(ViewBag.line_chart.LineCharYearLabel))),
+            },
+            yaxis: {
+                title: {
+                    text: '$ (thousands)'
+                }
+            },
+            fill: {
+                opacity: 1
+            },
+            tooltip: {
+                y: {
+                    formatter: function (val) {
+                        return "$ " + toNumberStr(val);
+                    }
+                }
+            }
+        };
+
+        var chart = new ApexCharts(document.querySelector("#chart"), options);
+        chart.render();
+    </script>
+}

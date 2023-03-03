@@ -1,0 +1,50 @@
+﻿<div class="col-xl-12">
+    <div class="card your_balance">
+        <div class="card-header border-0">
+            <div>
+                <h2 class="heading mb-1">Your Balance</h2>
+                <span>June 1, 2020, 08:22 AM</span>
+            </div>
+        </div>
+        <div class="card-body pt-0 custome-tooltip">
+            <div class="row gx-0">
+                <div class="col-xl-12 col-sm-12" style="position: relative;">
+                    <div class="col-md-6 mt-3 t-r">
+                        <label for="floatingTextarea">Month</label>
+                        <input style="text-align:right" type="text" class="form-control t-r" name="report_month" id="report_month" />
+                    </div>
+                    <div id="custom_month"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script>
+        $(document).ready(function(){
+            setDatePicker('#report_month');
+           // setDatePicker('#report_month');
+        });
+
+        $("#report_month").change(function(){
+            alert($("#report_month").val());
+            const _reqModel = {
+                report_month: $("#report_month").val()
+            }
+            $.ajax({
+                url: "/DayByDayReport/DayByDayReportCustomMonth",
+                type : "POST",
+                data : {reqModel : _reqModel},
+                dataType : "json",
+                success : function(json){
+                    $("#custom_month").load("/DayByDayReport/DayByDayReportDetail", function () {
+                    
+                    });
+                    //setTimeout(function () {
+                    //    window.location.href = "/DatePickerReport/Detail";
+                    //}, 1000)
+                }
+            });
+        });
+    </script>
+}

@@ -1,0 +1,53 @@
+﻿@section header{
+    @await Html.PartialAsync("_PartialHeader", new HeaderModel("Current Month"))
+}
+<div class="col-xl-7">
+    <div class="card your_balance">
+        <div class="card-header border-0">
+            <div>
+                @*<h2 class="heading mb-1">Current Month</h2>*@
+            </div>
+        </div>
+        <div class="card-body pt-0 custome-tooltip">
+            <div class="row gx-0">
+                <div class="col-xl-12 col-sm-12" style="position: relative;">
+                    <div id="pie_chart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script>
+        var pie_options = {
+            series: @(Html.Raw(JsonConvert.SerializeObject(ViewBag.pie_chart.PieChartLabel))),
+            chart: {
+                width: 380,
+                type: 'pie',
+            },
+            labels: ['Expense', 'Income'],
+            tooltip: {
+                y: {
+                    formatter: function (val) {
+                        return "$ " + toNumberStr(val);
+                    }
+                }
+            },
+            responsive: [{
+                breakpoint: 480,
+                options: {
+                    chart: {
+                        width: 200
+                    },
+                    legend: {
+                        position: 'bottom'
+                    }
+                },
+            }],
+
+        };
+
+        var chart = new ApexCharts(document.querySelector("#pie_chart"), pie_options);
+        chart.render();
+    </script>
+}

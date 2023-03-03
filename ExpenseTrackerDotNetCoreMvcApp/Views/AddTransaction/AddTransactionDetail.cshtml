@@ -1,0 +1,43 @@
+﻿@model ExpenseTrackerResponseViewModel
+@{
+    Layout = null;
+}
+
+@foreach (var item in Model.lstExpenseTracker)
+{
+
+    @if (item.transaction_type == "Income")
+    {
+        <li class="plus">
+            @(item.description)<span>+@(item.amount)</span><button class="delete-btn" type="button" data-delet-id="@(item.id)">
+                <i class="fa fa-times"></i>
+            </button>
+        </li>
+    }
+    else
+    {
+        <li class="minus">
+            @(item.description)<span>-@(item.amount)</span><button class="delete-btn" type="button" data-delet-id="@(item.id)">
+                <i class="fa fa-times"></i>
+            </button>
+        </li>
+    }
+}
+
+<nav>
+    <ul class="pagination">
+        @for (int i = 1; i <= Model.TotalPageNo; i++)
+        {
+            if (i == Model.CurrentPageNo)
+            {
+                <li class="page-item active">
+                    <a class="page-link" href="javascript:void(0)">@i</a>
+                </li>
+            }
+            else
+            {
+                <li class="page-item"><a class="page-link" href="javascript:void(0)">@i</a></li>
+            }
+        }
+    </ul>
+</nav>

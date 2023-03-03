@@ -1,0 +1,21 @@
+﻿
+<div class="col-12">
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title">Basic Datatable</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <div id="TransactionHistory"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        $("#TransactionHistory").load('/TransactionHistory/TransactionHistoryDetail', function () {
+            $('#tbDataTable').DataTable();
+        });
+    </script>
+}

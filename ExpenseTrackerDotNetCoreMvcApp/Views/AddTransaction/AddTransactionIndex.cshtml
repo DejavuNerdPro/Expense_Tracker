@@ -1,0 +1,191 @@
+﻿@section header{
+    @await Html.PartialAsync("_PartialHeader", new HeaderModel("Expense Tracker"))
+}
+
+@section css{
+    <style>
+        .list {
+            list-style-type: none;
+            padding: 0;
+            margin-bottom: 40px;
+        }
+
+        .list li {
+            background-color: var(--background-secondary-color);
+            box-shadow: var(--box-shadow);
+            color: var(--ternary-color);
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            padding: 10px;
+            margin: 10px 0;
+            border-top-left-radius: 5px;
+            border-bottom-left-radius: 5px;
+        }
+
+        .money {
+            font-size: 20px;
+            letter-spacing: 1px;
+            margin: 5px 0;
+        }
+
+            .money.plus {
+                color: var(--plus-color);
+            }
+
+            .money.minus {
+                color: var(--minus-color);
+            }
+
+        .list li.plus {
+            border-left: 5px solid var(--plus-color);
+        }
+
+        .list li.minus {
+            border-left: 5px solid var(--minus-color);
+        }
+
+    </style>
+}
+
+<div class="text-center">
+    <div>
+        <div>
+            <h2>Your Balance</h2>
+            <h2 id="balance">$0.00</h2>
+        </div>
+    </div>
+    <div>
+        <div>
+            <h4>Income</h4>
+            <p id="money-plus">+$0.00</p>
+        </div>
+        <div>
+            <h4>Expenses</h4>
+            <p id="money-minus">-$0.00</p>
+        </div>
+    </div>
+    <h3>History</h3>
+    <ul id="list" class="list"></ul>
+    <h3>Add new transaction</h3>
+    <form id="form">
+        <div class="form-control">
+            <label for="text">Description</label>
+            <input type="text" class="form-control input-rounded" id="description" placeholder="Enter description..." autofocus>
+        </div>
+        <div class="form-control">
+            <label for="amount">
+                Amount <br />
+                <small>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="Income">
+                        <label class="form-check-label" for="exampleRadios1">
+                            Income
+                        </label> <br>
+                        <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios2" value="Expense" checked>
+                        <label class="form-check-label" for="exampleRadios2">
+                            Expense
+                        </label>
+                    </div>
+                </small>
+            </label>
+            <input type="text" class="form-control input-rounded" id="amount" placeholder="Enter amount..." autofocus>
+        </div>
+        <button type="button" id="Add" class="btn btn-rounded btn-success">Add transaction</button>
+    </form>
+</div>
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $("#list").load("/AddTransaction/AddTransactionDetail");
+            $("#description").keydown(function (e) {
+                if (e.keyCode == 13) {
+                    $('#amount').focus();
+                }
+            });
+            $("#amount").inputFilter(function (value) {
+                return /^[0-9,]*$/.test(value);    // Allow digits only, using a RegExp
+            }, "Only digits allowed");
+        });
+
+        $("#amount").keyup(function () {
+            //const amount = $("#amount").val();
+            //const numberFormatter = Intl.NumberFormat('en-US');
+            //const formatted = numberFormatter.format(amount);
+            //console.log(formatted);
+            var num = toNumber($("#amount").val());
+            setTimeout(function () {
+                $("#amount").val(toNumberStr(num));
+            }, 50)
+            //$("#amount").val(toNumberStr(num));
+        });
+        $("#amount").keydown(function (event) {
+            if (event.keyCode === 13) {
+                $("#Add").click();
+            }
+        });
+        $("#Add").click(function () {
+            var val = $("#amount").val();
+            var desc = $("#description").val();
+            console.log(toNumber(val));
+            if (!isNullOrEmpty(toNumber(val)) && !isNullOrEmpty(desc)) {
+                var TransactionType = document.querySelector('input[name="exampleRadios"]:checked').value;
+                console.log(description);
+                const Amount = $("#amount").val();
+                const Description = $("#description").val();
+
+                const _reqModel = {
+                    Description: Description,
+                    TransactionType: TransactionType,
+                    Amount: Amount
+                };
+                $.ajax({
+                    url: "/AddTransaction/AddTransactionAdd",
+                    type: "POST",
+                    data: { reqModel: _reqModel },
+                    dataType: "json",
+                    success: function (json) {
+                        console.log({ json });
+                        $("#money-plus").html("$+" + json.incomeAmount);
+                        $("#money-minus").html("$-" + json.expenseAmount);
+                        $("#balance").html("$" + json.balance);
+                        $("#list").load("/AddTransaction/AddTransactionDetail", function () {
+                            var current_tasks = document.querySelectorAll(".delete-btn");
+                            for (var i = 0; i < current_tasks.length; i++) {
+                                current_tasks[i].onclick = function () {
+                                    this.parentNode.remove();
+                                    var DeleteId = $(this).data("delet-id");
+                                    const _reqModel = {
+                                        DeleteId: DeleteId
+                                    }
+                                    $.ajax({
+                                        url: "/AddTransaction/Delete",
+                                        type: "POST",
+                                        data: { reqModel: _reqModel },
+                                        dataType: "json",
+                                        success: function (json) {
+                                            console.log("Deleted");
+                                            $("#money-plus").html("$+" + json.incomeAmount);
+                                            $("#money-minus").html("$-" + json.expenseAmount);
+                                            $("#balance").html("$" + json.balance);
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    }
+                });
+            } else {
+                if (isNullOrEmpty(desc)) {
+                    alert("Enter Description");
+
+                }
+                else if (isNullOrEmpty(toNumber(val))) {
+                    alert("Enter amount or non negative amount")
+                }
+            }
+
+        });
+
+    </script>
+}
