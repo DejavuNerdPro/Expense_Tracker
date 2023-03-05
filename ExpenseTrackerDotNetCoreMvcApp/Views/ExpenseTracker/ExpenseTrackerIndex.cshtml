@@ -25,20 +25,31 @@
         <ul id="list" class="list"></ul>
         <nav aria-label="Page navigation example">
             <div class="row">
-                <span class="pagination page-item">
-                    <span class="page-link" aria-label="Previous" id="previous">
-                        <span aria-hidden="true">&laquo;</span>
-                        <span class="sr-only">Previous</span>
-                    </span>
-                </span>
-                <ul id="itemsContainer" class="horizontal-list"></ul>
-                    
-                    <span class="pagination page-item">
-                        <span class="page-link" aria-label="Next" id="next">
-                            <span aria-hidden="true">&raquo;</span>
-                            <span class="sr-only">Next</span>
-                        </span>
-                    </span>
+                <div class="col-md-4"></div>
+                <div class="col-md-8">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <span class="pagination page-item">
+                                <span class="page-link" aria-label="previous" id="previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                    <span class="sr-only">Previous</span>
+                                </span>
+                            </span>
+                        </div>
+                        <div class="col-md-8">
+                            <ul id="itemsContainer" class="pagination"></ul>
+                        </div>
+                        <div class="col-md-2">
+                            <span class="pagination page-item">
+                                <span class="page-link" aria-label="Next" id="next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                    <span class="sr-only">Next</span>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
             </div> 
 </nav>
        
@@ -71,6 +82,7 @@
 @section scripts{
     <script>
         let _transaction_Detail;
+        let pagination_item;
         const balance = document.getElementById("balance");
         const moneyPlus = document.getElementById("money-plus");
         const moneyMinus = document.getElementById("money-minus");
@@ -83,11 +95,15 @@
         const itemsContainer = document.getElementById("itemsContainer");
         var numberOfPage;
         var pageRange;
+        var pageIndexSize;
+        var startIndex = 1;
+        var currentIndex=1;
 
         $("#body-container").ready(async function () {
             console.log("Document Loaded");
+            await initialRetrieve();
             await addTransactionDOM();
-            updateValues();
+            await updateValues();
             $("#description").focus();
         });
 
@@ -163,25 +179,66 @@
         });
 
         $("#previous").click(function () {
-            console.log("Previous click.");
-            if (pageRange == 1) {
-                console.log("Start of page : ");
-                pageRange = 1;
+            const length = _transaction_Detail.length;
+            console.log("Previous click at : ", currentIndex);
+            if (currentIndex == 1) {
+                console.log("Start of page.");
+                startIndex = 1;
+                currentIndex = 1;
+               
+                pageClick(currentIndex);
             } else {
-                pageRange--;
+                if (currentIndex > 5 || currentIndex > numberOfPage - 5) {
+                    console.log("It is not between 1 to 5 or before 5 of end ", currentIndex, ">5", currentIndex, ">", numberOfPage - 5);
+                    startIndex--;
+                    if (startIndex == 0) {
+                        startIndex = 1;
+                    }
+                    pageIndexSize--;
+                    if (pageIndexSize <= 5) {
+                        pageIndexSize = 5;
+                    }
+                    
+                }
+                
+                pageClick(currentIndex);
+                currentIndex--;
             }
-            console.log("Page Range : ", pageRange);
+           
+            paginationIndexing(length);
+            console.log("Current Index : ", currentIndex);
+            console.log("Start Index : ", startIndex);
+            console.log("Page Index Size : ", pageIndexSize);
         });
 
         $("#next").click(function () {
-            console.log("Next click.");
-            if (pageRange == 10) {
-                pageRange = 10;
-                console.log("End of page : ");
+            const length = _transaction_Detail.length;
+            console.log("Next click at : ", currentIndex);
+            if (currentIndex == numberOfPage) {
+                console.log("End of page.");
+                //startIndex = numberOfPage;
+                currentIndex = numberOfPage;
+                startIndex++;
+                pageIndexSize++;
+                pageClick(currentIndex);
             } else {
-                pageRange++;
+                if (pageIndexSize < numberOfPage + 1 && startIndex < numberOfPage-3) {
+                    if (currentIndex > 5 || currentIndex > numberOfPage - 5) {
+                        console.log("It is not between 1 to 5 or before 5 of end ", currentIndex, ">5", currentIndex, ">", numberOfPage - 5);
+                        console.log("Number of Page change or not : ", numberOfPage);
+                        startIndex++;
+                        pageIndexSize++;
+                    }
+
+                    pageClick(currentIndex);
+                    currentIndex++;
+                }
             }
-            console.log("Page Range : ", pageRange);
+            
+            paginationIndexing(length);
+            console.log("Current Index : ", currentIndex);
+            console.log("Start Index : ", startIndex);
+            console.log("Page Index Size : ", pageIndexSize);
         });
 
         function showNotification() {
@@ -264,28 +321,16 @@
             console.log("Outer Ajax ExpenseTrackerProduce:", _transaction_Detail);
             const length = _transaction_Detail.length;
             console.log("Length : ", length);
-            for (var i = 0; i < length; i++) {
-                console.log("For loop inner : ")
-                const amount = _transaction_Detail[i].amount;
-                console.log("Amount : ", amount, " ", typeof amount);
-                const transactionType = _transaction_Detail[i].transactionType;
-                const sign = transactionType === "expense" ? "-" : "+";
-                const valided_amount = amount.toString().substring(1);
-                console.log("Sign : ", sign, "Amount : ", valided_amount);
-                console.log("Expense Tracker Detail : ", _transaction_Detail[i].description, " ", sign, " ", _transaction_Detail[i].id);
-                const item = document.createElement("li");
-                item.classList.add(sign === "-" ? "minus" : "plus");
-                item.innerHTML = `
-                  ${_transaction_Detail[i].description} <span>${sign}${Math.abs(amount)}</span
-                  ><button class="delete-btn" onclick="removeTransaction(${_transaction_Detail[i].id})"><i class="fa fa-times"></i></button>
-            `;
-                list.appendChild(item);
-            }
-            
+            await paginationIndexing(length);
+        }
+
+        function paginationIndexing(length) {
+            console.log("Pagination");
+            itemsContainer.innerHTML = "";
             if (length % 5 != 0) {
                 var digit = Math.trunc(length / 5); //to transform float to pure number
                 console.log("After Converting digit : ", digit, " Wired : ", Math.trunc(46 / 5));
-                numberOfPage = digit+1;
+                numberOfPage = digit + 1;
             } else {
                 numberOfPage = length / 5;
             }
@@ -298,16 +343,66 @@
                 pageRange = numberOfPage / 5;
             }
             console.log("Number of  page range : ", pageRange);
-            for (var i = 1; i <= pageRange; i++) {
-                console.log("page Rage iterator : ", i);
+            if (pageIndexSize === undefined) {
+                console.log("Page Index Size is undefined");
+                pageIndexSize = 5;
+            }
+            console.log("Page Index Size : ", pageIndexSize);
+            for (var i = startIndex; i <= pageIndexSize; i++) {
+                console.log("Page Range iterator : ", i);
                 const item = document.createElement("li");
-                item.innerHTML = `${i}`;
+                item.innerHTML = `<button class="page-item page-link" onclick="pageClick(${i})>${i}</button>`;
                 itemsContainer.appendChild(item);
             }
+            
         }
 
         function pageClick(i) {
-            Console.log("Clicked at : ", i);
+            currentIndex = i;
+            console.log("Current index : ", i);
+            $(".page-item.page-link").removeClass("page-item page-link");
+            $(".page-item.page-link").addClass("circle-button");
+            const _transaction = {
+                pageIndex:i
+            };
+            console.log("Transaction : ", _transaction);
+            $.ajax({
+                url: "/Pagination/PaginationIndexingWithValues",
+                type: "POST",
+                data: { transaction: _transaction },
+                dataType: "json",
+                success: function (response) {
+                    var row = response.data;
+                    console.log("Pagination : ", row);
+                    var length = row.length;
+                    appendListItem(row, length);
+                }
+            });
+            
+        }
+
+        function appendListItem(row, length) {
+            console.log("Append list item");
+            console.log("row items : ", row);
+            console.log("Length : ", length);
+            list.innerHTML = "";
+            for (var i = 0; i < length; i++) {
+                console.log("For loop inner : ")
+                const amount = row[i].amount;
+                console.log("Amount : ", amount, " ", typeof amount);
+                const transactionType = row[i].transactionType;
+                const sign = transactionType === "expense" ? "-" : "+";
+                const valided_amount = amount.toString().substring(1);
+                console.log("Sign : ", sign, "Amount : ", valided_amount);
+                console.log("Expense Tracker Detail : ", row[i].description, " ", sign, " ", row[i].id);
+                const item = document.createElement("li");
+                item.classList.add(sign === "-" ? "minus" : "plus");
+                item.innerHTML = `
+                  ${row[i].description} <span>${sign}${Math.abs(amount)}</span
+                  ><button class="delete-btn" onclick="removeTransaction(${row[i].id})"><i class="fa fa-times"></i></button>
+            `;
+                list.appendChild(item);
+            }
         }
 
         function retrieve() {
@@ -315,6 +410,20 @@
                 url: "/ExpenseTracker/ExpenseTrackerProduce",
                 type: "GET",
                 dataType: "json",
+            });
+        }
+        function initialRetrieve() {
+            console.log("Initial :");
+            $.ajax({
+                url: "/Pagination/PaginationIndexingInitial",
+                type: "POST",
+                dataType: "json",
+                success: function (response) {
+                    var row = response.data;
+                    var length = row.length;
+                    console.log("Initial retrieve : ", row , " length : ", length);
+                    appendListItem(row, length);
+                }
             });
         }
 
