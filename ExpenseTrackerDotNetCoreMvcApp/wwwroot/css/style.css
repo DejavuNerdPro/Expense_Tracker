@@ -241,8 +241,6 @@ input[type="number"] {
 }
 
 .circle-button {
-    background-color:antiquewhite;
-    border-radius: 50%;
-    border: 1px solid red;
+    background-color:cyan;
 }
 

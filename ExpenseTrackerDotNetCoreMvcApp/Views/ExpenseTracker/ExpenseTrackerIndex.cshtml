@@ -37,7 +37,7 @@
                             </span>
                         </div>
                         <div class="col-md-8">
-                            <ul id="itemsContainer" class="pagination"></ul>
+                            <ul id="itemsContainer" class="pagination page-item"></ul>
                         </div>
                         <div class="col-md-2">
                             <span class="pagination page-item">
@@ -67,7 +67,7 @@
                 </div>
                 <input type="text" id="amount" placeholder="Enter amount..." name="Amount" />
             </div>
-            <button class="btn" type="button" id="add_tranaction">Add transaction</button>
+            <button class="btn" type="button" id="add_transaction">Add transaction</button>
         </form>
     </div>
 </div>
@@ -102,7 +102,8 @@
         $("#body-container").ready(async function () {
             console.log("Document Loaded");
             await initialRetrieve();
-            await addTransactionDOM();
+            await getTotalLength();
+            await paginationIndexing(length);
             await updateValues();
             $("#description").focus();
         });
@@ -166,7 +167,13 @@
                 $("#amount").val(numberWithCommas(amount));
             }, 50);
         });
-
+        async function getTotalLength() {
+            const response = await retrieve();
+            _transaction_Detail = response.list;
+            console.log("Outer Ajax ExpenseTrackerProduce:", _transaction_Detail);
+            const length = _transaction_Detail.length;
+            console.log("Length : ", length);
+        }
         function numberWithCommas(x) {
             var parts = x.toString().split(".");
             parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -185,7 +192,6 @@
                 console.log("Start of page.");
                 startIndex = 1;
                 currentIndex = 1;
-               
                 pageClick(currentIndex);
             } else {
                 if (currentIndex > 5 || currentIndex > numberOfPage - 5) {
@@ -200,7 +206,6 @@
                     }
                     
                 }
-                
                 pageClick(currentIndex);
                 currentIndex--;
             }
@@ -229,12 +234,10 @@
                         startIndex++;
                         pageIndexSize++;
                     }
-
                     pageClick(currentIndex);
                     currentIndex++;
                 }
             }
-            
             paginationIndexing(length);
             console.log("Current Index : ", currentIndex);
             console.log("Start Index : ", startIndex);
@@ -322,6 +325,7 @@
             const length = _transaction_Detail.length;
             console.log("Length : ", length);
             await paginationIndexing(length);
+            await pageClick(1);
         }
 
         function paginationIndexing(length) {
@@ -351,17 +355,22 @@
             for (var i = startIndex; i <= pageIndexSize; i++) {
                 console.log("Page Range iterator : ", i);
                 const item = document.createElement("li");
-                item.innerHTML = `<button class="page-item page-link" onclick="pageClick(${i})>${i}</button>`;
+                item.setAttribute("id", "button-container");
+                item.innerHTML = `<button  class="page-link" id="btn${i}" onclick="pageClick(${i})">${i}</button>`;
                 itemsContainer.appendChild(item);
             }
             
         }
 
         function pageClick(i) {
+            console.log("Triggered");
             currentIndex = i;
             console.log("Current index : ", i);
-            $(".page-item.page-link").removeClass("page-item page-link");
-            $(".page-item.page-link").addClass("circle-button");
+            //cursoring a button in a list
+            var btn = $(`#btn${i}`);
+            console.log("btn", i, btn);
+            $(`#btn${i}`).removeClass("page-link");
+            $(`#btn${i}`).addClass("btn btn-primary btn-sm");
             const _transaction = {
                 pageIndex:i
             };
@@ -433,10 +442,8 @@
             console.log("Remove Transaction is done.", { response });
             $("#list").ready(function () {
                 console.log("List Loading .");
-                _transaction_Detail = null;
                 list.innerHTML = "";
-                console.log("Transaction Detail during remove : ", _transaction_Detail);
-                addTransactionDOM();
+                pageClick(currentIndex);
                 updateValues();
             });
         }
@@ -464,6 +471,7 @@
                     $("#money-plus").html("+$ " + response.income);
                     $("#money-minus").html("-$ " + response.expense);
                     $("#description").focus();
+                    console.log("Updated .");
                 }
 
             });

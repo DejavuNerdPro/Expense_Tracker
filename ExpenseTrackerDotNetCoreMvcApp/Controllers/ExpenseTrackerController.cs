@@ -77,13 +77,14 @@ namespace ExpenseTRacker.Controllers
             return Json(new {removeTransaction = "Successfully removed." });
         }
 
+        [HttpPost]
         public IActionResult ExpenseTrackerUpdateValues()
         {
             var list = DbService.getRow.ToList();
-            int total = list.Sum(i=>Convert.ToInt32(i.Amount));
+           // int total = list.Sum(i=>Convert.ToInt32(i.Amount));
             var _income = list.Where(i => i.TransactionType == "income").Sum(i => i.Amount);
             var _expense = list.Where(i => i.TransactionType == "expense").Sum(i => i.Amount);
-            var _balance = Convert.ToInt32(_income) - Convert.ToInt32(_expense);
+            var _balance = _income - _expense;
             return Json(new { income = _income, expense = _expense, balance=_balance });
         }
     }
