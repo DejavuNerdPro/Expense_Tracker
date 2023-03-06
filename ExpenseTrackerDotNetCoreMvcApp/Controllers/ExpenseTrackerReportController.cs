@@ -47,9 +47,9 @@ namespace ExpenseTrackerDotNetCoreMvcApp.Controllers
             }
             LineChartModel model = new LineChartModel
             {
-                LineChartIncomeLabel = list.Where(x => x.transaction_type == "Income")
+                LineChartIncomeLabel = list.Where(x => x.transaction_type == "income")
                                        .Select(x => x.amount).ToList(),
-                LineChartExpenseLabel = list.Where(x => x.transaction_type == "Expense")
+                LineChartExpenseLabel = list.Where(x => x.transaction_type == "expense")
                                        .Select(x => x.amount).ToList(),
                 LineCharYearLabel = filter,
             };

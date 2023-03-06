@@ -1,4 +1,4 @@
-﻿function toNumber(x) {
+﻿function toNumberStr(x) {
     return x.replace(/,(?=\d{3})/g, "");
 }
 

@@ -1,0 +1,50 @@
+﻿@model ExpenseTrackerResponseViewModel
+@{
+    Layout = null;
+    int id = 0;
+}
+<table id="tbDataTable" class="display dataTable no-footer" style="min-width: 845px">
+    <thead>
+        <tr>
+            <th>No</th>
+            <th>Date</th>
+            <th>Description</th>
+            <th>Transaction Type</th>
+            <th>Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var item in Model.lstExpenseTracker)
+        {
+
+            <tr>
+                <td>@((Model.CurrentPageNo-1)*Model.RowCount + (++id))</td>
+                <td>@(item.date.ToString("dddd, dd MMMM yyyy"))</td>
+                <td>@(item.description)</td>
+                <td>@(item.transaction_type)</td>
+                <td>@(item.amount)</td>
+            </tr>
+
+        }
+
+    </tbody>
+</table>
+
+<nav>
+    <ul class="pagination">
+        @for (int i = 1; i <= Model.TotalPageNo; i++)
+        {
+            if (i == Model.CurrentPageNo)
+            {
+                <li class="page-item active">
+                    <button class="page-link" onclick="fetchMonthData(@i)">@i</button>
+                </li>
+            }
+            else
+            {
+                <li class="page-item"><button class="page-link" onclick="fetchMonthData(@i)">@i</button></li>
+            }
+        }
+    </ul>
+</nav>

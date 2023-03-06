@@ -17,6 +17,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Remove="Views\TransactionHistory\TransactionDetailMonth.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="Views\ExpenseTracker\ExpenseTrackerIndex.cshtml" />
   </ItemGroup>
 

@@ -1,21 +1,65 @@
-﻿
+﻿<div id="container">
 <div class="col-12">
     <div class="card">
         <div class="card-header">
-            <h4 class="card-title">Basic Datatable</h4>
+            <h4 class="card-title">Datatable</h4>
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <div id="TransactionHistory"></div>
+                <div id="TransactionHistoryYear"></div>
             </div>
         </div>
     </div>
 </div>
-
+<div class="col-12">
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title">Monthly Datatable</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <div id="TransactionHistoryMonth"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-12">
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title">90Days Datatable</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <div id="TransactionHistory90Days"></div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
 @section scripts{
     <script>
-        $("#TransactionHistory").load('/TransactionHistory/TransactionHistoryDetail', function () {
-            $('#tbDataTable').DataTable();
+        $(document).ready(function () {
+            console.log("make it");
+            $("#TransactionHistoryYear").load('/TransactionHistory/TransactionHistoryDetailYear');
+            $("#TransactionHistoryMonth").load('/TransactionHistory/TransactionHistoryDetailMonth');
+            $("#TransactionHistory90Days").load('/TransactionHistory/TransactionHistoryDetail90Days');
+            //var index = 0;
+            //fetchYearData(index);
+            //fetchMonthData(index);
+            //fetch90DaysData(index);
         });
+        function fetchYearData(index) {
+            console.log("fetchYearData : ", index);
+            $("#TransactionHistoryYear").load(`/TransactionHistory/TransactionHistoryDetailYear?pageIndex=${index}`);
+
+        }
+        function fetchMonthData(index) {
+            console.log("fetchMonthData : ", index);
+            $("#TransactionHistoryMonth").load(`/TransactionHistory/TransactionHistoryDetailMonth?pageIndex=${index}`);
+        }
+        function fetch90DaysData(index) {
+            console.log("fetch90DaysData : ", index);
+            $("#TransactionHistory90Days").load(`/TransactionHistory/TransactionHistoryDetail90Days?pageIndex=${index}`);
+        }
     </script>
 }
