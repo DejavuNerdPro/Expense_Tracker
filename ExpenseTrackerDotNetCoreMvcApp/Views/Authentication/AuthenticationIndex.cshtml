@@ -1,0 +1,115 @@
+﻿@{ 
+    Layout = "~/Views/Shared/_LayoutAuth.cshtml";
+}
+<div class="row h-100 align-items-center justify-contain-center">
+    <div class="col-xl-12">
+        <div class="card">
+            <div class="card-body p-0">
+                <div class="row m-0">
+                    <div class="col-xl-6 col-md-6 sign text-center">
+                        <div>
+                            <div class="text-center my-5">
+                                <a href="index.html"><img src="images/logo-full.png" alt=""></a>
+                            </div>
+                            <img src="images/log.png" class="img-fix bitcoin-img sd-shape7" alt="">
+                        </div>
+                    </div>
+                    <div class="col-xl-6 col-md-6">
+                        <div class="sign-in-your py-4 px-2">
+                            <h4 class="fs-20">Sign in your account</h4>
+                            <span>
+                                Welcome back! Login with your data that you entered<br> during
+                                registration
+                            </span>
+                            <div class="login-social">
+                                <a href="javascript:void(0);" class="btn d-block btn-primary my-3">
+                                    <i class="fab fa-google me-2"></i>Login with Google
+                                </a>
+                                <a href="javascript:void(0);" class="btn d-block btn-secondary my-3">
+                                    <i class="fab fa-facebook-f me-2"></i>Login with Facebook
+                                </a>
+                            </div>
+                            <form action="index.html">
+                                <div class="mb-3">
+                                    <label class="mb-1"><strong>Email</strong></label>
+                                    <input type="email" class="form-control" value="hello@example.com" id="email">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="mb-1"><strong>Password</strong></label>
+                                    <input type="password" class="form-control" value="Password" id="password">
+                                </div>
+                                <div class="row d-flex justify-content-between mt-4 mb-2">
+                                    <div class="mb-3">
+                                        <div class="form-check custom-checkbox ms-1">
+                                            <input type="checkbox" class="form-check-input"
+                                                   id="basic_checkbox_1">
+                                            <label class="form-check-label" for="basic_checkbox_1">
+                                                Remember my
+                                                preference
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <a href="page-forgot-password.html">Forgot Password?</a>
+                                    </div>
+                                </div>
+                                <div class="text-center">
+                                    <button type="button" class="btn btn-primary btn-block" id="sign_me_in">Sign Me In</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{ 
+    <script>
+        $("#sign_me_in").click(function () {
+        var email = $("#email").val();
+        var password = $("#password").val();
+
+        var isValidatedEmail = emailValidation(email);
+        var isValidatedPassword = passwordValidation(password);
+        console.log("Email Validation : ", isValidatedEmail);
+        console.log("Password Validation : ", isValidatedPassword);
+        if (isValidatedEmail && isValidatedPassword) {
+            window.location.href = "/ExpenseTrackerReport/ExpenseTrackerReportIndex";
+        } else {
+            if (!isValidatedEmail) {
+                $("#email").val("");
+                $("#email").focus();
+            } else if (!isValidatedPassword) {
+                $("#password").val("");
+                $("#password").focus();
+            }
+        }
+    });
+
+    $(document).ready(function () {
+        $("#email").focus();
+    });
+
+    $("#email").on("keypress paste", function (event) {
+        if (event.keyCode == 13) {
+            $("#password").focus();
+        }
+    });
+
+    $("#password").on("keypress paste", function (event) {
+        if (event.keyCode == 13) {
+            window.location.href = "/ExpenseTrackerReport/ExpenseTrackerReportIndex";
+        }
+    });
+    function emailValidation(email) {
+        var regx_email = /^\w+([\.-]?\w+)*@@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+        return email.match(regx_email) ? true : false;
+    }
+
+    function passwordValidation(password) {
+        var regx_password = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/; //6 to 20 characters which contain at least one numeric digit, one uppercase and one lowercase letter
+        return password.match(regx_password) ? true : false;
+    }
+    </script>
+}
