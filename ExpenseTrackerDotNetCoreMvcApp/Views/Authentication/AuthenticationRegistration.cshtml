@@ -1,0 +1,110 @@
+﻿@model RegistrationFormModel
+@{
+    Layout = "~/Views/Shared/_LayoutAuth.cshtml";
+}
+
+<div class="row justify-content-center h-100 align-items-center">
+    <div class="col-md-6">
+        <div class="authincation-content">
+            <div class="row no-gutters">
+                <div class="col-xl-12">
+                    <div class="auth-form page-r-logo">
+                        <div class="text-center mb-3">
+                            <a href="index.html"><img src="images/logo-full.png" alt="" class="dark-logo"></a>
+                            <a href="index.html"><img src="images/logo-full-light.png" alt="" class="light-logo m-auto"></a>
+                        </div>
+                        <h4 class="text-center mb-4">Sign up your account</h4>
+                        <form action="/Authentication/AuthenticationRegistrationValidation" method="post">
+                            <div class="mb-3">
+                                <label class="mb-1"><strong>Username</strong></label>
+                                <input type="text" class="form-control" placeholder="username" name="user_name" id="user_name">
+                            </div>
+                            <div class="mb-3">
+                                <label class="mb-1"><strong>Email</strong></label>
+                                <input type="email" class="form-control" placeholder="hello@example.com" name="email" id="email">
+                            </div>
+                            <div class="mb-3">
+                                <label class="mb-1"><strong>Password</strong></label>
+                                <input type="password" class="form-control" name="password" id="password">
+                            </div>
+                            <div class="mb-3">
+                                <label class="mb-1"><strong>Confirm Password</strong></label>
+                                <input type="password" class="form-control" name="password" id="confirm_password">
+                            </div>
+                            <div class="text-center mt-4">
+                                <button type="button" class="btn btn-primary btn-block" id="sign_me_up">Sign me up</button>
+                            </div>
+                        </form>
+                        <div class="new-account mt-3">
+                            <p>Already have an account? <a class="text-primary" href="/Authentication/AuthenticationIndex">Sign in</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $("#user_name").focus();
+        });
+        $("#user_name").on("keypress paste", function (e) {
+            if (e.keyCode == 13) {
+                $("#email").focus();
+            }
+        });
+        $("#email").on("keypress paste", function (e) {
+            if (e.keyCode == 13) {
+                $("#password").focus();
+            }
+        });
+        $("#password").on("keypress paste", function (e) {
+            if (e.keyCode == 13) {
+                $("#confirm_password").focus();
+            }
+        });
+        $("#confirm_password").on("keypress paste", function (e) {
+            if (e.keyCode == 13) {
+                authorization();
+            }
+        });
+        $("#sign_me_up").click(function () {
+            authorization();
+        });
+        function authorization() {
+            var _user_name = $("#user_name").val();
+            var _email = $("#email").val();
+            var _password = $("#password").val();
+            var _confirm_password = $("#confirm_password").val();
+
+            if (_password != _confirm_password) {
+                console.log("Passwords are not same.");
+                $("confirm_password").focus();
+            } else {
+                console.log("Validated Password");
+                const _registrationData = { user_name: _user_name, email: _email, password: _password };
+                $.ajax({
+                    url: "/Authentication/AuthenticationRegistrationValidation",
+                    type: "POST",
+                    dataType: "json",
+                    data: { registrationData: _registrationData },
+                    success: function (response) {
+                        console.log("Register Response : ", { response });
+                        var message = response.message;
+                        if (message == "transaction_done") {
+                            console.log("Successfully Signed Up");
+                        } else if (message == "user_already_exist") {
+                            console.log("Fail to Sign Up");
+                        } else {
+
+                        }
+                    }
+
+                });
+            }
+        }
+    </script>
+
+
+}

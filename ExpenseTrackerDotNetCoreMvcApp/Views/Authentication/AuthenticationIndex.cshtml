@@ -53,10 +53,15 @@
                                         <a href="page-forgot-password.html">Forgot Password?</a>
                                     </div>
                                 </div>
-                                <div class="text-center">
-                                    <button type="button" class="btn btn-primary btn-block" id="sign_me_in">Sign Me In</button>
-                                </div>
-                            </form>
+                                <div class="row">
+                                    <div class="mb-3">
+                                        Do not have account? &nbsp;&nbsp;<a href="/Authentication/AuthenticationRegistration"><small><u>Sign Up</u></small></a>
+                                    </div>
+                                 </div>
+                                    <div class="text-center">
+                                        <button type="button" class="btn btn-primary btn-block" id="sign_me_in">Sign Me In</button>
+                                    </div>
+</form>
                         </div>
                     </div>
                 </div>
@@ -67,24 +72,7 @@
 @section scripts{ 
     <script>
         $("#sign_me_in").click(function () {
-        var email = $("#email").val();
-        var password = $("#password").val();
-
-        var isValidatedEmail = emailValidation(email);
-        var isValidatedPassword = passwordValidation(password);
-        console.log("Email Validation : ", isValidatedEmail);
-        console.log("Password Validation : ", isValidatedPassword);
-        if (isValidatedEmail && isValidatedPassword) {
-            window.location.href = "/ExpenseTrackerReport/ExpenseTrackerReportIndex";
-        } else {
-            if (!isValidatedEmail) {
-                $("#email").val("");
-                $("#email").focus();
-            } else if (!isValidatedPassword) {
-                $("#password").val("");
-                $("#password").focus();
-            }
-        }
+            authorization();
     });
 
     $(document).ready(function () {
@@ -99,7 +87,7 @@
 
     $("#password").on("keypress paste", function (event) {
         if (event.keyCode == 13) {
-            window.location.href = "/ExpenseTrackerReport/ExpenseTrackerReportIndex";
+            authorization();
         }
     });
     function emailValidation(email) {
@@ -110,6 +98,44 @@
     function passwordValidation(password) {
         var regx_password = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/; //6 to 20 characters which contain at least one numeric digit, one uppercase and one lowercase letter
         return password.match(regx_password) ? true : false;
+        }
+
+    function authorization() {
+         var email = $("#email").val();
+         var password = $("#password").val();
+
+         var isValidatedEmail = emailValidation(email);
+         var isValidatedPassword = passwordValidation(password);
+         console.log("Email Validation : ", isValidatedEmail);
+        console.log("Password Validation : ", isValidatedPassword);
+
+        const _login = { Email: email, Password: password };
+        if (isValidatedEmail && isValidatedPassword) {
+            $.ajax({
+                url:"/Authentication/AuthenticationLogin",
+                type: "POST",
+                dataType: "json",
+                data: { login: _login },
+                success: function (response) {
+                    console.log("Response Authorization : ", { response });
+                    var message = response.isSuccess;
+                    if (!message) {
+
+                    } else {
+                        window.location.href ="/ExpenseTrackerReport/ExpenseTrackerReportIndex"
+                    }
+                }
+            });
+             
+         } else {
+             if (!isValidatedEmail) {
+                 $("#email").val("");
+                 $("#email").focus();
+             } else if (!isValidatedPassword) {
+                 $("#password").val("");
+                 $("#password").focus();
+             }
+         }
     }
     </script>
 }
