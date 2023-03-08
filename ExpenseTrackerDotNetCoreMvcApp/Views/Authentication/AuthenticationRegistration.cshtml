@@ -14,7 +14,7 @@
                             <a href="index.html"><img src="images/logo-full-light.png" alt="" class="light-logo m-auto"></a>
                         </div>
                         <h4 class="text-center mb-4">Sign up your account</h4>
-                        <form action="/Authentication/AuthenticationRegistrationValidation" method="post">
+                        <form>
                             <div class="mb-3">
                                 <label class="mb-1"><strong>Username</strong></label>
                                 <input type="text" class="form-control" placeholder="username" name="user_name" id="user_name">
@@ -29,7 +29,7 @@
                             </div>
                             <div class="mb-3">
                                 <label class="mb-1"><strong>Confirm Password</strong></label>
-                                <input type="password" class="form-control" name="password" id="confirm_password">
+                                <input type="password" class="form-control" name="confirm-password" id="confirm_password">
                             </div>
                             <div class="text-center mt-4">
                                 <button type="button" class="btn btn-primary btn-block" id="sign_me_up">Sign me up</button>
@@ -46,6 +46,11 @@
 </div>
 @section scripts{
     <script>
+        var _user_name = $("#user_name").val();
+        var _email = $("#email").val();
+        var _password = $("#password").val();
+        var _confirm_password = $("#confirm_password").val();
+
         $(document).ready(function () {
             $("#user_name").focus();
         });
@@ -55,29 +60,80 @@
             }
         });
         $("#email").on("keypress paste", function (e) {
+            var _email = $("#email").val();
             if (e.keyCode == 13) {
-                $("#password").focus();
+                var isValidated = emailValidation(_email);
+                if (isValidated) {
+                    $("#password").focus();
+                } else {
+                    $("#email").focus();
+                }
+                
             }
         });
         $("#password").on("keypress paste", function (e) {
+            var _password = $("#password").val();
             if (e.keyCode == 13) {
-                $("#confirm_password").focus();
+                var isValidated = passwordValidation(_password);
+                if (isValidated) {
+                    console.log("Password is validated.");
+                    $("#confirm_password").focus();
+                } else {
+                    console.log("Password is invalidated.");
+                    $("#password").focus();
+                }
             }
         });
         $("#confirm_password").on("keypress paste", function (e) {
+            var _email = $("#email").val();
+            var _password = $("#password").val();
+            var _confirm_password = $("#confirm_password").val();
             if (e.keyCode == 13) {
-                authorization();
+                var is_validated_email = emailValidation(_email);
+                var is_validated_confirm_password = passwordValidation(_confirm_password);
+                var is_validated_password = passwordValidation(_password);
+                if (is_validated_email && is_validated_password) {
+                    authorization();
+                } else if (!is_validated_confirm_password) {
+                    $("#confirm_password").focus();
+                } else if (!is_validated_password) {
+                    $("#password").focus();
+                } else if (is_validated_email) {
+                    $("#email").focus();
+                }
+                
             }
         });
         $("#sign_me_up").click(function () {
-            authorization();
+            var _email = $("#email").val();
+            var _password = $("#password").val();
+            var is_validated_email = emailValidation(_email);
+            var is_validated_password = passwordValidation(_password);
+            console.log("Validate Email : ", is_validated_email);
+            console.log("Validate Password : ", is_validated_password);
+            if (is_validated_email && is_validated_password) {
+                console.log("Verified.");
+                authorization();
+            } else {
+                $("#email").focus();
+            }
+            
         });
+
+        function emailValidation(email) {
+            var regx_email = /^\w+([\.-]?\w+)*@@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+            return email.match(regx_email) ? true : false;
+        }
+        function passwordValidation(password) {
+            var regx_password = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/; //6 to 20 characters which contain at least one numeric digit, one uppercase and one lowercase letter
+            return password.match(regx_password) ? true : false;
+        }
+
         function authorization() {
             var _user_name = $("#user_name").val();
             var _email = $("#email").val();
             var _password = $("#password").val();
             var _confirm_password = $("#confirm_password").val();
-
             if (_password != _confirm_password) {
                 console.log("Passwords are not same.");
                 $("confirm_password").focus();
@@ -93,9 +149,12 @@
                         console.log("Register Response : ", { response });
                         var message = response.message;
                         if (message == "transaction_done") {
-                            console.log("Successfully Signed Up");
+                            console.log("Successfully Signed Up.");
+                           // Notify.success('Successfully Signed Up.');
+                            window.location.href = "/ExpenseTrackerReport/ExpenseTrackerReportIndex";
                         } else if (message == "user_already_exist") {
                             console.log("Fail to Sign Up");
+                           // Notify.failure('Fail to Sign Up');
                         } else {
 
                         }

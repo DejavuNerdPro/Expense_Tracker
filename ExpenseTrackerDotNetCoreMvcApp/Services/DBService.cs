@@ -1,4 +1,5 @@
 ﻿using ExpenseTRacker.Models;
+using ExpenseTrackerDotNetCoreMvcApp.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -14,5 +15,6 @@ namespace ExpenseTRacker.Services
 
         }
         public DbSet<ExpenseTrackerDataModel> getRow { get; set; }
+        public DbSet<UserDataModel> getUserData { get; set; }
     }
 }

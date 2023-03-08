@@ -120,8 +120,9 @@
                     console.log("Response Authorization : ", { response });
                     var message = response.isSuccess;
                     if (!message) {
-
+                       // Notify.failure('Fail to login.');
                     } else {
+                       // Notify.success('Successfully Logined.');
                         window.location.href ="/ExpenseTrackerReport/ExpenseTrackerReportIndex"
                     }
                 }
@@ -131,9 +132,11 @@
              if (!isValidatedEmail) {
                  $("#email").val("");
                  $("#email").focus();
+                 //Notify.failure('Invalid email.');
              } else if (!isValidatedPassword) {
                  $("#password").val("");
                  $("#password").focus();
+                 //Notify.failure('Invalid password.');
              }
          }
     }
