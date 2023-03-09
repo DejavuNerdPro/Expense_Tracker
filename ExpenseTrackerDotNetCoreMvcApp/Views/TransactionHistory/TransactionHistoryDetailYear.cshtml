@@ -14,7 +14,7 @@
         </tr>
     </thead>
     <tbody>
-      
+
         @foreach (var item in Model.lstExpenseTracker)
         {
 
@@ -25,26 +25,76 @@
                 <td>@(item.transaction_type)</td>
                 <td>@(item.amount)</td>
             </tr>
-            
+
         }
-       
+
     </tbody>
 </table>
 
 <nav>
     <ul class="pagination">
-        @for (int i = 1; i <= Model.TotalPageNo; i++)
-        {
-            if (i == Model.CurrentPageNo)
+        <li class="page-item"><button class="page-link" onclick="" href="javascript:void(0)">&laquo;</button></li>
+        @{
+            bool firstDesign = Model.CurrentPageNo <= 3 || Model.CurrentPageNo >= Model.CurrentPageNo - 2;
+            bool secondDesign = !firstDesign;
+
+            if (firstDesign)
             {
+                for (int i = 1; i <= 4; i++)
+                {
+                    if (i == Model.CurrentPageNo)
+                    {
+                        <li class="page-item active">
+                            <button class="page-link" onclick="fetchYearData(@i)">@i</button>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="page-item"><button class="page-link" onclick="fetchYearData(@i)">@i</button></li>
+                    }
+                }
+                <li class="page-item"><a class="page-link" href="javascript:avoid(0)">.....</a></li>
+
+                for (int i = Model.TotalPageNo - 3; i <= Model.CurrentPageNo; i++)
+                {
+                    if (i == Model.CurrentPageNo)
+                    {
+                        <li class="page-item active">
+                            <button class="page-link" onclick="fetchYearData(@i)">@i</button>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="page-item"><button class="page-link" onclick="fetchYearData(@i)">@i</button></li>
+                    }
+                }
+            }
+            else if (secondDesign)
+            {
+                int start = 1;
                 <li class="page-item active">
-                    <button class="page-link" onclick="fetchYearData(@i)">@i</button>
+                    <button class="page-link" onclick="fetchYearData(@start)">@start</button>
+                </li>
+                <li class="page-item"><a class="page-link" href="javascript:avoid(0)">.....</a></li>
+                for (int i = Model.CurrentPageNo - 2; i <= Model.CurrentPageNo + 2; i++)
+                {
+                    if (i == Model.CurrentPageNo)
+                    {
+                        <li class="page-item active">
+                            <button class="page-link" onclick="fetchYearData(@i)">@i</button>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="page-item"><button class="page-link" href="fetchYearData(@i)">@i</button></li>
+                    }
+                }
+                <li class="page-item"><a class="page-link" onclick="javascript:avoid(0)">.....</a></li>
+                <li class="page-item active">
+                    <button class="page-link" onclick="fetchYearData(@Model.TotalPageNo)">@Model.TotalPageNo</button>
                 </li>
             }
-            else
-            {
-                <li class="page-item"><button class="page-link" onclick="fetchYearData(@i)">@i</button></li>
-            }
         }
+        <li class="page-item"><button class="page-link" onclick="" href="javascript:void(0)">&raquo;</button></li>
     </ul>
 </nav>

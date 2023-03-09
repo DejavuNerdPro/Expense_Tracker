@@ -23,6 +23,13 @@ namespace ExpenseTrackerDotNetCoreMvcApp.Controllers
             return View("AuthenticationIndex");
         }
 
+//        login 
+//-username and password are same? welcome back
+//-store user_unique Id and session Id in session
+//-if both id in session is not null welcome back
+//-implement hash code in password
+
+
         public IActionResult AuthenticationLogin(Login login)
         {
             string email = login.Email;

@@ -1,4 +1,5 @@
 using ExpenseTRacker.Services;
+using ExpenseTrackerDotNetCoreMvcApp.Middleware;
 using ExpenseTrackerDotNetCoreMvcApp.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -45,6 +46,9 @@ namespace ExpenseTrackerDotNetCoreMvcApp
             //    opt.UseSqlServer(Configuration.GetConnectionString("DbConnection"));
             //});
             services.AddScoped<DapperService>();
+            services.AddDbContext<SessionDbContext>(opt => {
+                opt.UseSqlServer(Configuration.GetConnectionString("DbConnection"));
+            });
             
         }
 
@@ -63,7 +67,7 @@ namespace ExpenseTrackerDotNetCoreMvcApp
             }
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
+            app.UseSessionMiddleware();
             app.UseRouting();
 
             app.UseAuthorization();
