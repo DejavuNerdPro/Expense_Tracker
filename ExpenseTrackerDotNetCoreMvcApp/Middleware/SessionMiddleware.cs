@@ -15,27 +15,35 @@ namespace ExpenseTrackerDotNetCoreMvcApp.Middleware {
             _next = next;
         }
 
-        string signInUrl = "/Authentication/AuthenticationIndex";
-        string LogOutUrl = "/Authentication/LogOut";
-
+        string signInUrl = "/Authentication";
+        string logOutUrl = "/Authentication/Logout";
+       
         //initial possible routes
         List<string> passUrl = new List<string>
         {
             "/Authentication",
-            "/Authentication/AuthenticationIndex",
+            "/Authentication/Index",
             "/Authentication/AuthenticationLogin",
             "/Authentication/AuthenticationRegistration",
             "/Authentication/AuthenticationRegistrationValidation",
+            "/ExpenseTrackerReport/ExpenseTrackerReportIndex",
+            "/ExpenseTracker/ExpenseTrackerIndex",
+            "/TransactionHistory/TransactionHistoryIndex",
+            "/YearlyReport/YearlyReportIndex",
+            "/DayByDayReport/DayByDayReportIndex",
+            "/CurrentMonthReport/CurrentMonthReportIndex"
         };
 
         public async Task InvokeAsync(HttpContext context, SessionDbContext _db) {
             string url = context.Request.Path;
+
             if (passUrl.Count(x => x.ToLower() == url.ToLower()) > 0) goto result;
 
             if (url.ToLower() == signInUrl.ToLower()) goto result;
 
             if (context.Session.GetString("UserId") == null ||
-                context.Session.GetString("SessionId") == null) {
+                context.Session.GetString("SessionId") == null)
+            {
                 context.Response.Redirect(signInUrl);
             }
 
@@ -43,32 +51,27 @@ namespace ExpenseTrackerDotNetCoreMvcApp.Middleware {
             string sessionId = context.Session.GetString("SessionId");
 
             if (userId == null || sessionId == null ||
-                string.IsNullOrEmpty(userId.Trim()) || string.IsNullOrEmpty(sessionId.Trim())) {
+                string.IsNullOrEmpty(userId.Trim()) || string.IsNullOrEmpty(sessionId.Trim()))
+            {
                 context.Response.Redirect(signInUrl);
             }
-
-            //if(LogOutUrl.ToLower() == url.ToLower())
-            //{
-            //    context.Session.Clear();
-            //    context.Response.Redirect(signInUrl);
-            //}
             var item = await _db.session
-                .FirstOrDefaultAsync(x => 
+                .FirstOrDefaultAsync(x =>
                     x.user_unique_id == userId &&
                     x.session_id == sessionId);
-            //var item = await _db.session.ToListAsync();
-            //var item = await _db.session
-            //    .FirstOrDefaultAsync(x => x.login_id == 1);
+            
 
-            if (item == null) {
+            if (item == null)
+            {
                 context.Response.Redirect(signInUrl);
             }
 
-            if (item != null && item.session_exp_datetime <= DateTime.Now) {
+            if (item != null && item.session_exp_datetime <= DateTime.Now)
+            {
                 context.Session.Clear();
                 context.Response.Redirect(signInUrl);
             }
-            result:
+        result:
             await _next(context);
         }
     }

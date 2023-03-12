@@ -36,7 +36,7 @@
                             </div>
                         </form>
                         <div class="new-account mt-3">
-                            <p>Already have an account? <a class="text-primary" href="/Authentication/AuthenticationIndex">Sign in</a></p>
+                            <p>Already have an account? <a class="text-primary" href="/Authentication/Index">Sign in</a></p>
                         </div>
                     </div>
                 </div>
@@ -150,11 +150,11 @@
                         var message = response.message;
                         if (message == "transaction_done") {
                             console.log("Successfully Signed Up.");
-                           // Notify.success('Successfully Signed Up.');
-                            window.location.href = "/ExpenseTrackerReport/ExpenseTrackerReportIndex";
+                            //Notify.success('Successfully Signed Up.');
+                            window.location.href = "/Authentication/Index";
                         } else if (message == "user_already_exist") {
                             console.log("Fail to Sign Up");
-                           // Notify.failure('Fail to Sign Up');
+                            //Notify.failure('Fail to Sign Up');
                         } else {
 
                         }

@@ -2,6 +2,7 @@
 @{
     Layout = null;
     int id = 0;
+    int uiNav = 1;
 }
 <table id="tbDataTable" class="display dataTable no-footer" style="min-width: 845px">
     <thead>
@@ -30,21 +31,160 @@
 
     </tbody>
 </table>
-
-<nav>
-    <ul class="pagination">
-        @for (int i = 1; i <= Model.TotalPageNo; i++)
-        {
-            if (i == Model.CurrentPageNo)
-            {
+@if (uiNav == 0)
+{
+    @if (Model.lstExpenseTracker != null)
+    {
+        <nav>
+            <ul class="pagination">
                 <li class="page-item active">
-                    <button class="page-link" onclick="fetch90DaysData(@i)">@i</button>
+                    <a onclick="fetch90DaysData(@Model.CurrentPageNo - 1)" class="page-link" href="javascript:void(0)" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                @{
+                    int startPageNo = 1;
+                    int endPageNo = 5;
+                    if (Model.CurrentPageNo - 2 < 0 || Model.CurrentPageNo > 0)
+                    {
+                        startPageNo = Model.CurrentPageNo - 2;
+                        if (Model.CurrentPageNo > 3)
+                        {
+                            endPageNo = Model.CurrentPageNo + 2;
+                        }
+                    }
+                }
+                @for (int i = startPageNo; i <= endPageNo; i++)
+                {
+                    if (i > 0 && i <= Model.TotalPageNo)
+                    {
+                        if (i == Model.CurrentPageNo)
+                        {
+                            <li class="page-item active">
+                                <a class="page-link" href="javascript:void(0)">@i</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="page-item">
+                                <a onclick="fetch90DaysData(@i)" class="page-link" href="javascript:void(0)">@i</a>
+                            </li>
+                        }
+                    }
+                }
+                @if (Model.CurrentPageNo != Model.TotalPageNo)
+                {
+                    <li class="page-item active">
+                        <a onclick="fetch90DaysData(@Model.CurrentPageNo + 1)" class="page-link" href="javascript:void(0)" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </li>
+                }
+            </ul>
+        </nav>
+
+    }
+}
+else if (Model.TotalPageNo != 0)
+{
+    <nav>
+        <ul class="pagination">
+            <li class="page-item active">
+                <a onclick="fetch90DaysData(@Model.CurrentPageNo - 1)" class="page-link" href="javascript:void(0)" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                    <span class="sr-only">Previous</span>
+                </a>
+            </li>
+            @{
+                bool firstDesign = Model.CurrentPageNo <= 3 || Model.CurrentPageNo >= Model.TotalPageNo - 2;
+                bool secondDesign = !firstDesign;
+            }
+            @if (firstDesign)
+            {
+                int leftEndPageNo = 4;
+                bool rightEndPageNoExist = Model.TotalPageNo - 3 > leftEndPageNo;
+                if (!rightEndPageNoExist)
+                {
+                    leftEndPageNo = Model.TotalPageNo;
+                }
+                @for (int i = 1; i <= leftEndPageNo; i++)
+                {
+                    if (i == Model.CurrentPageNo)
+                    {
+                        <li class="page-item active">
+                            <a class="page-link" href="javascript:void(0)">@i</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="page-item">
+                            <a onclick="fetch90DaysData(@i)" class="page-link" href="javascript:void(0)">@i</a>
+                        </li>
+                    }
+                }
+                @if (rightEndPageNoExist)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="javascript:void(0)">...</a>
+                    </li>
+                    @for (int i = Model.TotalPageNo - 3; i <= Model.TotalPageNo; i++)
+                    {
+                        if (i == Model.CurrentPageNo)
+                        {
+                            <li class="page-item active">
+                                <a class="page-link" href="javascript:void(0)">@i</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="page-item">
+                                <a onclick="fetch90DaysData(@i)" class="page-link" href="javascript:void(0)">@i</a>
+                            </li>
+                        }
+                    }
+                }
+            }
+            else if (secondDesign)
+            {
+                <li class="page-item">
+                    <a onclick="fetch90DaysData(1)" class="page-link" href="javascript:void(0)">1</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="javascript:void(0)">...</a>
+                </li>
+                @for (int i = Model.CurrentPageNo - 2; i <= Model.CurrentPageNo + 2; i++)
+                {
+                    if (i == Model.CurrentPageNo)
+                    {
+                        <li class="page-item active">
+                            <a class="page-link" href="javascript:void(0)">@i</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="page-item">
+                            <a onclick="fetch90DaysData(@i)" class="page-link" href="javascript:void(0)">@i</a>
+                        </li>
+                    }
+                }
+                <li class="page-item">
+                    <a class="page-link" href="javascript:void(0)">...</a>
+                </li>
+                <li class="page-item">
+                    <a onclick="fetch90DaysData(@Model.TotalPageNo)" class="page-link" href="javascript:void(0)">@Model.TotalPageNo</a>
                 </li>
             }
-            else
+            @if (Model.CurrentPageNo != Model.TotalPageNo)
             {
-                <li class="page-item"><button class="page-link" onclick="fetch90DaysData(@i)">@i</button></li>
+                <li class="page-item active">
+                    <a onclick="fetch90DaysData(@Model.CurrentPageNo + 1)" class="page-link" href="javascript:void(0)" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
             }
-        }
-    </ul>
-</nav>
+        </ul>
+    </nav>
+}

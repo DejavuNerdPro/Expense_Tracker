@@ -23,30 +23,24 @@ namespace ExpenseTrackerDotNetCoreMvcApp.Controllers
         public IActionResult TransactionHistoryDetailYear(int pageIndex)
         {
             int index = pageIndex;
-            int pageNo;
-            if (index == 0)
-            {
-                pageNo = 1;
-            }
-            else
-            {
-                pageNo = index;
-            }
+            int pageNo=index==0? 1:index;
             int rowCount = 5;
+            string queryCount = @"select count(id) from [dbo].[Tbl_ExpenseTracker]
+                                where Date 
+                                BETWEEN  DATEFROMPARTS(YEAR(GETDATE()), 1, 1) AND GETDATE()
+                                ";
+            var count = _db.GetItem<int>(queryCount);
+            pageNo = index == count ? count : index;
+
             string query = $@"select * from [dbo].[Tbl_ExpenseTracker]
                             where Date
                             BETWEEN  DATEFROMPARTS(YEAR(GETDATE()), 1, 1) AND GETDATE()
                             order by date desc
                             OFFSET {(pageNo - 1) * rowCount} ROWS FETCH NEXT {rowCount} ROWS ONLY
                             ";
-
-            string queryCount = @"select count(id) from [dbo].[Tbl_ExpenseTracker]
-                                where Date 
-                                BETWEEN  DATEFROMPARTS(YEAR(GETDATE()), 1, 1) AND GETDATE()
-                                ";
             var list = _db.GetList<ExpenseTrackerDataModel>(query);
-            var count = _db.GetItem<int>(queryCount);
-
+           
+            
             var lst = list.Select(x => new ExpenseTrackerViewModel
             {
                 id = x.Id,
@@ -75,26 +69,22 @@ namespace ExpenseTrackerDotNetCoreMvcApp.Controllers
         public IActionResult TransactionHistoryDetailMonth(int pageIndex)
         {
             int index = pageIndex;
-            int pageNo;
-            if (index == 0)
-            {
-                pageNo = 1;
-            }
-            else
-            {
-                pageNo = index;
-            }
+            int pageNo=index==0? 1:index;
             int rowCount = 5;
+            string queryCount = @"select count(id) from [dbo].[Tbl_ExpenseTracker]
+                                where Date 
+                                BETWEEN  DATEFROMPARTS(YEAR(GETDATE()), 1, 1) AND GETDATE()
+                                ";
+            var count = _db.GetItem<int>(queryCount);
+            pageNo = index == count ? count : index;
+
             string query = $@"select * from [dbo].[Tbl_ExpenseTracker]
-                            where Convert(varchar(7), Date ,126) = Convert(varchar(7), GETDATE(),126)
+                            where Date
+                            BETWEEN  DATEFROMPARTS(YEAR(GETDATE()), 1, 1) AND GETDATE()
                             order by date desc
                             OFFSET {(pageNo - 1) * rowCount} ROWS FETCH NEXT {rowCount} ROWS ONLY
                             ";
-            string queryCount = @"select count(id) from [dbo].[Tbl_ExpenseTracker]
-                                where CONVERT(varchar(7), Date, 126) = CONVERT(varchar(7), GETDATE(), 126)
-                                ";
             var list = _db.GetList<ExpenseTrackerDataModel>(query);
-            var count = _db.GetItem<int>(queryCount);
 
             var lst = list.Select(x => new ExpenseTrackerViewModel
             {
@@ -124,29 +114,22 @@ namespace ExpenseTrackerDotNetCoreMvcApp.Controllers
         public IActionResult TransactionHistoryDetail90Days(int pageIndex)
         {
             int index = pageIndex;
-            int pageNo;
-            if (index == 0)
-            {
-                pageNo = 1;
-            }
-            else
-            {
-                pageNo = index;
-            }
+            int pageNo = index == 0 ? 1 : index;
             int rowCount = 5;
+            string queryCount = @"select count(id) from [dbo].[Tbl_ExpenseTracker]
+                                where Date 
+                                BETWEEN  DATEFROMPARTS(YEAR(GETDATE()), 1, 1) AND GETDATE()
+                                ";
+            var count = _db.GetItem<int>(queryCount);
+            pageNo = index == count ? count : index;
+
             string query = $@"select * from [dbo].[Tbl_ExpenseTracker]
                             where Date
-                            BETWEEN  DATEADD(day, -90, GETDATE()) AND GETDATE()
+                            BETWEEN  DATEFROMPARTS(YEAR(GETDATE()), 1, 1) AND GETDATE()
                             order by date desc
                             OFFSET {(pageNo - 1) * rowCount} ROWS FETCH NEXT {rowCount} ROWS ONLY
                             ";
-
-            string queryCount = @"select count(id) from [dbo].[Tbl_ExpenseTracker]
-                                where Date 
-                                BETWEEN  DATEADD(day, -90, GETDATE()) AND GETDATE()
-                                ";
             var list = _db.GetList<ExpenseTrackerDataModel>(query);
-            var count = _db.GetItem<int>(queryCount);
 
             var lst = list.Select(x => new ExpenseTrackerViewModel
             {

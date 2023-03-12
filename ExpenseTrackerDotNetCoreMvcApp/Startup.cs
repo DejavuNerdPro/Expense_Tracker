@@ -45,11 +45,12 @@ namespace ExpenseTrackerDotNetCoreMvcApp
             //{
             //    opt.UseSqlServer(Configuration.GetConnectionString("DbConnection"));
             //});
-            services.AddScoped<DapperService>();
+            
             services.AddDbContext<SessionDbContext>(opt => {
                 opt.UseSqlServer(Configuration.GetConnectionString("DbConnection"));
             });
-            
+            services.AddScoped<DapperService>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -67,16 +68,15 @@ namespace ExpenseTrackerDotNetCoreMvcApp
             }
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseSessionMiddleware();
             app.UseRouting();
-
             app.UseAuthorization();
             app.UseSession();
+            app.UseSessionMiddleware();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Authentication}/{action=AuthenticationIndex}/{id?}");
+                    pattern: "{controller=Authentication}/{action=Index}/{id?}");
             });
         }
     }

@@ -223,8 +223,8 @@
                 console.log("End of page.");
                 //startIndex = numberOfPage;
                 currentIndex = numberOfPage;
-                startIndex++;
-                pageIndexSize++;
+                //startIndex++;
+                //pageIndexSize++;
                 pageClick(currentIndex);
             } else {
                 if (pageIndexSize < numberOfPage + 1 && startIndex < numberOfPage-3) {
@@ -369,8 +369,8 @@
             //cursoring a button in a list
             var btn = $(`#btn${i}`);
             console.log("btn", i, btn);
-            $(`#btn${i}`).removeClass("page-link");
-            $(`#btn${i}`).addClass("btn btn-primary btn-sm");
+            //$(`#btn${i}`).removeClass("page-link");
+            //$(`#btn${i}`).addClass("btn btn-primary btn-sm");
             const _transaction = {
                 pageIndex:i
             };

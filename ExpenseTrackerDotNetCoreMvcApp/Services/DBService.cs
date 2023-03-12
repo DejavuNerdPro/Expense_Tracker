@@ -16,5 +16,6 @@ namespace ExpenseTRacker.Services
         }
         public DbSet<ExpenseTrackerDataModel> getRow { get; set; }
         public DbSet<UserDataModel> getUserData { get; set; }
+        public DbSet<LoginDataModel> getLoginData { get; set; }
     }
 }
