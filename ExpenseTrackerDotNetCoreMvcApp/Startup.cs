@@ -71,7 +71,7 @@ namespace ExpenseTrackerDotNetCoreMvcApp
             app.UseRouting();
             app.UseAuthorization();
             app.UseSession();
-            app.UseSessionMiddleware();
+            //app.UseSessionMiddleware();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(

@@ -41,13 +41,24 @@
 </div>
 @section scripts{
     <script>
-        $(document).ready(function () {
+        $(document).ready(async function () {
             console.log("make it");
-            $("#TransactionHistoryYear").load('/TransactionHistory/TransactionHistoryDetailYear');
-            $("#TransactionHistoryMonth").load('/TransactionHistory/TransactionHistoryDetailMonth');
-            $("#TransactionHistory90Days").load('/TransactionHistory/TransactionHistoryDetail90Days');
+            await loadYearData();
+            await loadMonthData();
+            await load90DaysData();
         });
 
+        function loadYearData() {
+            $("#TransactionHistoryYear").load('/TransactionHistory/TransactionHistoryDetailYear');
+        }
+
+        function loadMonthData() {
+            $("#TransactionHistoryMonth").load('/TransactionHistory/TransactionHistoryDetailMonth');
+        }
+
+        function load90DaysData() {
+            $("#TransactionHistory90Days").load('/TransactionHistory/TransactionHistoryDetail90Days');
+        }
         function fetchYearData(index) {
             console.log("fetchYearData : ", index);
             $("#TransactionHistoryYear").load(`/TransactionHistory/TransactionHistoryDetailYear?pageIndex=${index}`);

@@ -30,7 +30,11 @@ namespace ExpenseTrackerDotNetCoreMvcApp.Controllers
                                 BETWEEN  DATEFROMPARTS(YEAR(GETDATE()), 1, 1) AND GETDATE()
                                 ";
             var count = _db.GetItem<int>(queryCount);
-            pageNo = index == count ? count : index;
+            int totalPageNo = count / rowCount;
+            int result = count % rowCount;
+            if (result > 0)
+                totalPageNo++;
+            pageNo = index == totalPageNo ? totalPageNo : pageNo;
 
             string query = $@"select * from [dbo].[Tbl_ExpenseTracker]
                             where Date
@@ -51,10 +55,7 @@ namespace ExpenseTrackerDotNetCoreMvcApp.Controllers
             }).ToList();
 
 
-            int totalPageNo = count / rowCount;
-            int result = count % rowCount;
-            if (result > 0)
-                totalPageNo++;
+            
 
             ExpenseTrackerResponseViewModel model = new ExpenseTrackerResponseViewModel();
             model.lstExpenseTracker = lst;
@@ -76,7 +77,11 @@ namespace ExpenseTrackerDotNetCoreMvcApp.Controllers
                                 BETWEEN  DATEFROMPARTS(YEAR(GETDATE()), 1, 1) AND GETDATE()
                                 ";
             var count = _db.GetItem<int>(queryCount);
-            pageNo = index == count ? count : index;
+            int totalPageNo = count / rowCount;
+            int result = count % rowCount;
+            if (result > 0)
+                totalPageNo++;
+            pageNo = index == totalPageNo ? totalPageNo : pageNo;
 
             string query = $@"select * from [dbo].[Tbl_ExpenseTracker]
                             where Date
@@ -94,13 +99,6 @@ namespace ExpenseTrackerDotNetCoreMvcApp.Controllers
                 description = x.Description,
                 transaction_type = x.TransactionType,
             }).ToList();
-
-
-            int totalPageNo = count / rowCount;
-            int result = count % rowCount;
-            if (result > 0)
-                totalPageNo++;
-
             ExpenseTrackerResponseViewModel model = new ExpenseTrackerResponseViewModel();
             model.lstExpenseTracker = lst;
             model.TotalRowCount = count;
@@ -121,7 +119,11 @@ namespace ExpenseTrackerDotNetCoreMvcApp.Controllers
                                 BETWEEN  DATEFROMPARTS(YEAR(GETDATE()), 1, 1) AND GETDATE()
                                 ";
             var count = _db.GetItem<int>(queryCount);
-            pageNo = index == count ? count : index;
+            int totalPageNo = count / rowCount;
+            int result = count % rowCount;
+            if (result > 0)
+                totalPageNo++;
+            pageNo = index == totalPageNo ? totalPageNo : pageNo;
 
             string query = $@"select * from [dbo].[Tbl_ExpenseTracker]
                             where Date
@@ -139,13 +141,6 @@ namespace ExpenseTrackerDotNetCoreMvcApp.Controllers
                 description = x.Description,
                 transaction_type = x.TransactionType,
             }).ToList();
-
-
-            int totalPageNo = count / rowCount;
-            int result = count % rowCount;
-            if (result > 0)
-                totalPageNo++;
-
             ExpenseTrackerResponseViewModel model = new ExpenseTrackerResponseViewModel();
             model.lstExpenseTracker = lst;
             model.TotalRowCount = count;
